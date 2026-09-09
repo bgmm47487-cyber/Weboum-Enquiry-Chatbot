@@ -10,9 +10,19 @@ from fastapi.exceptions import RequestValidationError
 from app.api.chat import router as chat_router
 from app.core.config import settings
 
+from contextlib import asynccontextmanager
+
 logger = logging.getLogger(__name__)
 
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info("Application startup")
+    yield
+    logger.info("Application shutdown")
+
 
 app = FastAPI(
     title="Company Website Chatbot",
@@ -21,6 +31,7 @@ app = FastAPI(
         "Single endpoint: POST /api/chat."
     ),
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 app.add_middleware(

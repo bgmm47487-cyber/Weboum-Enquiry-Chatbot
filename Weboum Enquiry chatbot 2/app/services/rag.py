@@ -71,13 +71,13 @@ def _get_embedding_model() -> Any:
 
         from sentence_transformers import SentenceTransformer
 
-        logger.info("Loading embedding model: %s", settings.EMBEDDING_MODEL)
+        logger.info("Embedding model loading")
         try:
             _embedding_model = SentenceTransformer(settings.EMBEDDING_MODEL)
         except Exception as exc:
-            logger.error("Failed to load embedding model %s: %s", settings.EMBEDDING_MODEL, exc)
+            logger.exception("RAG failed")
             raise RAGModelError(f"Failed to load embedding model {settings.EMBEDDING_MODEL}") from exc
-        logger.info("Embedding model loaded successfully: %s", settings.EMBEDDING_MODEL)
+        logger.info("Embedding model loaded")
         return _embedding_model
 
 
@@ -142,6 +142,7 @@ def embed_query(text: str) -> np.ndarray:
     model = _get_embedding_model()
     prompt = f"{BGE_QUERY_INSTRUCTION} {text.strip()}"
     vector = model.encode([prompt], normalize_embeddings=True)[0]
+    logger.info("Query embedding completed")
     return np.asarray(vector, dtype=np.float32)
 
 
@@ -193,7 +194,7 @@ def retrieve(
         if len(selected) >= final_count:
             break
 
-    logger.info("Embedding retrieval returned %d chunks for query: %s", len(selected), query)
+    logger.info("RAG retrieval completed")
     return selected
 
 
