@@ -12,6 +12,12 @@ from app.core.config import settings
 
 from contextlib import asynccontextmanager
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(levelname)s:     %(message)s",
+    force=True,
+)
+
 logger = logging.getLogger(__name__)
 
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
