@@ -1,16 +1,26 @@
 import logging
+import sys
+from pathlib import Path
+from contextlib import asynccontextmanager
+
+import numpy as np
+
+# Cross-compatibility shim between NumPy 1.x and NumPy 2.x pickles
+if not hasattr(np, "_core") and hasattr(np, "core"):
+    sys.modules["numpy._core"] = np.core
+    if hasattr(np.core, "numeric"):
+        sys.modules["numpy._core.numeric"] = np.core.numeric
+    if hasattr(np.core, "multiarray"):
+        sys.modules["numpy._core.multiarray"] = np.core.multiarray
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pathlib import Path
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.exceptions import RequestValidationError
 from app.api.chat import router as chat_router
 from app.core.config import settings
-
-from contextlib import asynccontextmanager
 
 logging.basicConfig(
     level=logging.INFO,
